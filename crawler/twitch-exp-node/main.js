@@ -35,37 +35,16 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
           await sleep(3500)
           i = 0
         }
-        let pkg = await getDataPackage(channel)
+  let pkg = await getDataPackage(channel)
 	pkg.timestamp = new Date()
 	pkg.tags.client_location = location
 	pkg.tags.client_ip = hostIP
 	console.log(pkg)
 	INFLUXBUFFER.push(pkg)
-	if (INFLUXBUFFER.length === 100) {
+	if (INFLUXBUFFER.length === 1000) {
 	  influx.writePoints(INFLUXBUFFER)
 	  INFLUXBUFFER = []
 	}
-	//influx.writePoints([pkg])
-        //  .then((response) => {
-	//    console.log(response)
-            //const pkg = response
-            // add in necessary data fields
-            //pkg.timestamp = new Date()
-            //pkg.tags.client_location = location
-            //pkg.tags.client_ip = hostIP
-            // influx.writePoints([pkg])
-            //INFLUXBUFFER.push(pkg)
-            //if (INFLUXBUFFER.length === 10) {
-            //  influx.writePoints(INFLUXBUFFER)
-            //  INFLUXBUFFER = []
-            //}
-        //  })
-        //  .catch((error) => {
-        //    if (error.message === 'TooManyErrors') {
-        //      console.log(`Too many server errors. Pause getting all addresses for ${language} channels`)
-        //      flag = false
-        //    } else { console.log(`Warning: ${error.message}`) }
-        //  })
       } else {
         console.log('Going to sleep...')
         await sleep(60000 * 5)
