@@ -1,1 +1,5 @@
 .ipynb_checkpoints
+
+#Dependency directories
+/crawler/twitch-exp-node/node_modules/
+/crawler/crawling-manager/node_modules/
