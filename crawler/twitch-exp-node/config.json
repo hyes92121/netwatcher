@@ -1,0 +1,14 @@
+{
+  "host": {
+	"name":"localhost"
+  },
+  "database":{
+	"name":"test_3"
+  },
+  "vpn_host": {
+	"ip":"210.217.18.68",
+	"country":"ko"	 
+  },
+  "viewer_percentage":0.8,
+  "languages":["zh-tw","ko","ja","fr","es","ru"]
+}
