@@ -1,3 +1,4 @@
+const axios = require('axios')
 const { getEdgeAddr } = require('./get_edge_addr.js')
 
 function getAllEdge (channel) {
@@ -46,3 +47,7 @@ function getAllEdge (channel) {
 }
 
 module.exports = { getAllEdge }
+
+if (require.main === module) {
+    console.log(getAllEdge('hongshio'))
+}
