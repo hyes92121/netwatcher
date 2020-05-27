@@ -8,9 +8,10 @@ pm2.connect(function(err) {
   
   pm2.start({
     name : "Twitch-Crawler",
-    script    : './twitch-exp-node/main.js',         // Script to be run
-    exec_mode : 'cluster',        // Allows your app to be clustered
-    instances : 4,                // Optional: Scales your app by 4
+    script    : '../twitch-exp-node/main.js',         // Script to be run
+    cwd: '../twitch-exp-node',
+    // exec_mode : 'cluster',        // Allows your app to be clustered
+    // instances : 4,                // Optional: Scales your app by 4
     max_memory_restart : '450M',   // Optional: Restarts your app if it reaches 100Mo
     cron : "0 */4 * * *",
     watch : true,

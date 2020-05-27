@@ -23,6 +23,6 @@ function getStreamInfo (channel) {
 module.exports = { getStreamInfo }
 
 if (require.main === module) {
-  getStreamInfo('mobilmobil')
+  getStreamInfo('bebelolz')
     .then(response => { console.log(response) })
 }

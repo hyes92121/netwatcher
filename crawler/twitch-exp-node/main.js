@@ -30,26 +30,26 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
     let i = 0
     for (const channel of liveChannels[language]) {
       if (flag) {
-        i += 1
-        if (i === 5) {
-          await sleep(3500)
-          i = 0
-        }
-  let pkg = await getDataPackage(channel)
-	pkg.timestamp = new Date()
-	pkg.tags.client_location = location
-	pkg.tags.client_ip = hostIP
-	console.log(pkg)
-	INFLUXBUFFER.push(pkg)
-	if (INFLUXBUFFER.length === 1000) {
-	  influx.writePoints(INFLUXBUFFER)
-	  INFLUXBUFFER = []
-	}
-      } else {
-        console.log('Going to sleep...')
-        await sleep(60000 * 5)
-        flag = true
+            i += 1
+            if (i === 5) {
+              await sleep(3500)
+              i = 0
+            }
+      let pkg = await getDataPackage(channel)
+      pkg.timestamp = new Date()
+      pkg.tags.client_location = location
+      pkg.tags.client_ip = hostIP
+      console.log(pkg)
+      INFLUXBUFFER.push(pkg)
+      if (INFLUXBUFFER.length === 1000) {
+        influx.writePoints(INFLUXBUFFER)
+        INFLUXBUFFER = []
       }
+          } else {
+            console.log('Going to sleep...')
+            await sleep(60000 * 5)
+            flag = true
+          }
     }
   }
   /* After initialization, schedule the recorder to shuffle between languages */

@@ -1,8 +1,10 @@
 const url = require('url')
 const dns = require('dns')
 const axios = require('axios')
+const { global_axios } = require('./global_axios.js')
 const { twitchAPI, usherAPI } = require('./api.js')
 const m3u8Parser = require('m3u8-parser')
+const {getAddress} = require('./local_dns_cache.js')
 
 function getAccessToken (channel) {
   return twitchAPI(`/api/channels/${channel}/access_token`).then(
@@ -38,7 +40,7 @@ function getEdgePlaylistUrl (playlist) {
 }
 
 function getPlaylist (uri) {
-  return axios.get(uri).then((response) => {
+  return global_axios.get(uri).then((response) => {
     return response.data
   })
 }
@@ -53,11 +55,13 @@ function getEdgeUrl (raw) {
 function lookUp (uri) {
   const host = url.parse(uri, true).hostname
   return new Promise((resolve, reject) => {
-    dns.resolve(host, (err, addrs, family) => {
-      if (err != null) {
-        reject(err)
-      } else { resolve(addrs[0]) }
-    })
+    resolve(getAddress(host))
+    // dns.resolve(host, (err, addrs, family) => {
+    //   if (err != null) {
+    //     reject(err)
+    //   } else { 
+    //     resolve(addrs[0]) }
+    // })
   })
 }
 
@@ -73,6 +77,6 @@ function getEdgeAddr (channel) {
 module.exports = { getEdgeAddr }
 
 if (require.main === module) {
-  getEdgeAddr('xargon0731')
+  getEdgeAddr('alex0920x')
     .then(response => console.log(response))
 }
