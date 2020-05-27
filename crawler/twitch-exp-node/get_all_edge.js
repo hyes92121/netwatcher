@@ -46,3 +46,8 @@ function getAllEdge (channel) {
 }
 
 module.exports = { getAllEdge }
+
+if (require.main === module) {
+  getEdgeAddr('roger9527')
+    .then(response => console.log(response))
+}
