@@ -32,7 +32,7 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
       if (flag) {
             i += 1
             if (i === 5) {
-              await sleep(3500)
+              // await sleep(3500)
               i = 0
             }
       let pkg = await getDataPackage(channel)
@@ -41,7 +41,7 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
       pkg.tags.client_ip = hostIP
       console.log(pkg)
       INFLUXBUFFER.push(pkg)
-      if (INFLUXBUFFER.length === 1000) {
+      if (INFLUXBUFFER.length === 50) {
         influx.writePoints(INFLUXBUFFER)
         INFLUXBUFFER = []
       }
@@ -68,14 +68,14 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
     console.log(`${new Date()} - Finished renewing topK list for ${languages[topKCounter]} channels!`)
     topKCounter += 1
     if ((topKCounter % languages.length) === 0) { topKCounter = 0 }
-  }, 60000 * 10)
+  }, 60000 * 5)
   setInterval(async () => {
     console.log(`${new Date()} - Writing topK streams for ${languages[writeCounter]} channels into database`)
     await write(languages[writeCounter])
     console.log(`${new Date()} - Finished writing topK streams for ${languages[writeCounter]} channels into database`)
     writeCounter += 1
     if ((writeCounter % languages.length) === 0) { writeCounter = 0 }
-  }, 60000 * 3.75)
+  }, 60000 * 2)
 }
 
 module.exports = { record }

@@ -45,8 +45,8 @@ function init(){
     console.log(`Initiating DNS cache...`)
     if(local_dns.cache) return
     local_dns.cache = new LRU(local_dns.lru_cache_config)
-    startPeriodicCachePrune()
-    startEntriesRefresh()
+    // startPeriodicCachePrune()
+    // startEntriesRefresh()
 }
 
 function startPeriodicCachePrune() {
