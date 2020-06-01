@@ -26,6 +26,7 @@ function getMasterPlaylist (token, channel) {
   })
 }
 
+//get Media Playlist that contains URLs of the files needed for streaming
 function getEdgePlaylistUrl (playlist) {
   const parsedPlaylist = []
   const lines = playlist.split('\n')
@@ -40,6 +41,7 @@ function getEdgePlaylistUrl (playlist) {
 }
 
 function getPlaylist (uri) {
+  console.log(uri)
   return global_axios.get(uri).then((response) => {
     return response.data
   })
@@ -49,6 +51,9 @@ function getEdgeUrl (raw) {
   const parser = new m3u8Parser.Parser()
   parser.push(raw)
   parser.end()
+  console.log(raw)
+  console.log(parser.manifest.segments.slice(-1))
+  //return the uri of the last .ts file
   return parser.manifest.segments.slice(-1).pop().uri
 }
 
@@ -77,6 +82,6 @@ function getEdgeAddr (channel) {
 module.exports = { getEdgeAddr }
 
 if (require.main === module) {
-  getEdgeAddr('alex0920x')
+  getEdgeAddr('ggbb528')
     .then(response => console.log(response))
 }

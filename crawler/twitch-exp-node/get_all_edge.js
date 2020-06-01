@@ -37,17 +37,18 @@ function getAllEdge (channel) {
           }) // no 'return' here to propagate error to upper level, so we handle the error locally
       }
     })(channel)
-
+    var hrstart = process.hrtime()
     const interval = setInterval(() => {
-      batchGetEdgeAddr(channel)
-      if (tries >= 10) { clearInterval(interval); resolve(edges) }
-    }, 1500)
+      batchGetEdgeAddr(channel);
+      if (tries >= 10) { clearInterval(interval);console.info('Execution time (hr): %ds %dms', process.hrtime(hrstart)[0], process.hrtime(hrstart)[1] / 1000000); resolve(edges) }
+    }, 1000)
   })
 }
 
 module.exports = { getAllEdge }
 
 if (require.main === module) {
-  getEdgeAddr('roger9527')
-    .then(response => console.log(response))
+  var hrstart = process.hrtime()
+  getAllEdge('relaxing234')
+    .then(response => {console.log(response); console.info('Execution time (hr): %ds %dms', process.hrtime(hrstart)[0], process.hrtime(hrstart)[1] / 1000000)})
 }

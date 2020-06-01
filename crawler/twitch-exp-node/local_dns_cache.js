@@ -46,7 +46,7 @@ function init(){
     if(local_dns.cache) return
     local_dns.cache = new LRU(local_dns.lru_cache_config)
     // startPeriodicCachePrune()
-    // startEntriesRefresh()
+    startEntriesRefresh()
 }
 
 function startPeriodicCachePrune() {
