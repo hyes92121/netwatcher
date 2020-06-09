@@ -6,17 +6,20 @@ const { getAllEdge } = require('./get_all_edge.js')
 function getAllEdgeSummary (channel) {
   return getAllEdge(channel)
     .then(response => {
+      let ipList = response.ipList
+      // console.log(response.time)
       return {
-        fields: {
-          num_edge: Object.keys(response).length,
-          ip_list: Object.keys(response).join(','),
-          fq_count: Object.values(response).join(',')
-        }
+          fields: {
+          num_edge: Object.keys(ipList).length,
+          ip_list: Object.keys(ipList).join(','),
+          fq_count: Object.values(ipList).join(',')
+        },
+          time: response.time
       }
     })
 }
 
-function getDataPackage (channel) {
+async function getDataPackage (channel) {
   return isOnline(channel)
     .then(response => {
       if (response) {
@@ -31,7 +34,10 @@ function getDataPackage (channel) {
     .then(response => {
       const info = response[0]; const summary = response[1]
       info.fields = { ...info.fields, ...summary.fields }
-      return info
+      return new Promise((resolve, reject) => { 
+          pkg = {time: summary.time, info: info}
+          resolve(pkg) 
+      })
     })
 }
 
@@ -41,11 +47,11 @@ if (require.main === module) {
   (async () => {
     console.log('Start')
     try {
-      const channels = ['sees360', 'westdoor', 'failverde']
+      const channels = ['pestily', 'esl_csgo', 'pimpcsgo', 'gorgc']
 
       for (const channel of channels) {
         getDataPackage(channel)
-          .then(data => { console.log(data) })
+          .then(pkg => { console.log(pkg) })
           .catch(error => { console.log(error) })
       }
     } catch (error) {

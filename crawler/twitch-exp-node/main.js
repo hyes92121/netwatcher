@@ -11,6 +11,8 @@ const sleep = async (ms) => {
   })
 }
 let INFLUXBUFFER = []
+let sleepDuration = 60*1000
+let is_first = true
 
 const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage = 0.8) => {
   const liveChannels = {}
@@ -30,28 +32,48 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
     let i = 0
     for (const channel of liveChannels[language]) {
       if (flag) {
-            i += 1
-            if (i === 5) {
-              // await sleep(3500)
-              i = 0
+        i += 1
+        if (i === 4) {
+          await sleep(sleepDuration)
+          i = 0
+          is_first = true
+        }
+        console.log(`Sending probe to ${channel}`)
+        getDataPackage(channel)
+          .then((response) => {
+            const time = response.time
+            if (is_first) { 
+                if (time < sleepDuration) { sleepDuration = time*1000; is_first = false; console.log(`Changing sleep duration to ${sleepDuration}`) } 
+            } else { 
+                if (time > sleepDuration) { sleepDuration = time*1000; console.log(`Changing sleep duration to ${sleepDuration}`) }
             }
-      let pkg = await getDataPackage(channel)
-      pkg.timestamp = new Date()
-      pkg.tags.client_location = location
-      pkg.tags.client_ip = hostIP
-      console.log(pkg)
-      INFLUXBUFFER.push(pkg)
-      if (INFLUXBUFFER.length === 50) {
-        influx.writePoints(INFLUXBUFFER)
-        INFLUXBUFFER = []
+            const pkg = response.info
+            // add in necessary data fields
+            pkg.timestamp = new Date()
+            pkg.tags.client_location = location
+            pkg.tags.client_ip = hostIP
+            // influx.writePoints([pkg])
+            INFLUXBUFFER.push(pkg)
+            if (INFLUXBUFFER.length === 50) {
+              influx.writePoints(INFLUXBUFFER)
+              console.log('Writing data from buffer into DB')
+              INFLUXBUFFER = []
+            }
+          })
+          .catch((error) => {
+            if (error.message === 'TooManyErrors') {
+              console.log(`Too many server errors. Pause getting all addresses for ${language} channels`)
+              flag = false
+            } else { console.log(`Warning: ${error.message}`) }
+          })
+      } else {
+        console.log('Going to sleep...')
+        await sleep(60000 * 5)
+        flag = true
       }
-          } else {
-            console.log('Going to sleep...')
-            await sleep(60000 * 5)
-            flag = true
-          }
     }
   }
+
   /* After initialization, schedule the recorder to shuffle between languages */
   let topKCounter = 0
   let writeCounter = 0
@@ -68,14 +90,16 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
     console.log(`${new Date()} - Finished renewing topK list for ${languages[topKCounter]} channels!`)
     topKCounter += 1
     if ((topKCounter % languages.length) === 0) { topKCounter = 0 }
-  }, 60000 * 5)
+  }, 60000 * 15)
   setInterval(async () => {
+    let  hrstart = process.hrtime()
     console.log(`${new Date()} - Writing topK streams for ${languages[writeCounter]} channels into database`)
     await write(languages[writeCounter])
     console.log(`${new Date()} - Finished writing topK streams for ${languages[writeCounter]} channels into database`)
+    console.info('Finished writing : %ds %dms', process.hrtime(hrstart)[0], process.hrtime(hrstart)[1] / 1000000)
     writeCounter += 1
     if ((writeCounter % languages.length) === 0) { writeCounter = 0 }
-  }, 60000 * 2)
+  }, 60000 * 10)
 }
 
 module.exports = { record }

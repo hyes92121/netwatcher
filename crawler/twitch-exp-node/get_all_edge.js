@@ -5,8 +5,8 @@ function getAllEdge (channel) {
   let errorCount = 0
   let tries = 0
   return new Promise((resolve, reject) => {
-    let batchGetEdgeAddr
-    (batchGetEdgeAddr = function (channel) {
+    function batchGetEdgeAddr(channel) {
+      // send 5 packets at a time 
       for (let i = 0; i < 5; i++) {
         getEdgeAddr(channel)
           .then((ip) => {
@@ -36,19 +36,23 @@ function getAllEdge (channel) {
             }
           }) // no 'return' here to propagate error to upper level, so we handle the error locally
       }
-    })(channel)
+    }
+
     var hrstart = process.hrtime()
     const interval = setInterval(() => {
       batchGetEdgeAddr(channel);
-      if (tries >= 10) { clearInterval(interval);console.info('Execution time (hr): %ds %dms', process.hrtime(hrstart)[0], process.hrtime(hrstart)[1] / 1000000); resolve(edges) }
-    }, 1000)
+      if (tries >= 10) { 
+          clearInterval(interval)
+          console.info('Finshed getting all edges with execution time (hr): %ds %dms', process.hrtime(hrstart)[0], process.hrtime(hrstart)[1]/1000000)
+          resolve({time: process.hrtime(hrstart)[0], ipList: edges}) 
+      }
+    }, 5000)
   })
 }
 
 module.exports = { getAllEdge }
 
 if (require.main === module) {
-  var hrstart = process.hrtime()
-  getAllEdge('relaxing234')
-    .then(response => {console.log(response); console.info('Execution time (hr): %ds %dms', process.hrtime(hrstart)[0], process.hrtime(hrstart)[1] / 1000000)})
+  getAllEdge('lpl')
+    .then(response => console.log(response))
 }

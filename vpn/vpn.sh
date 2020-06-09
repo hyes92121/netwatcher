@@ -1,11 +1,33 @@
 #!/bin/bash
-
-echo connect to nord vpn server 
+## add ip rule if not added
+echo "--------------------"
+echo Local routes setting check
+TABLE_EXIST=`ip rule show | grep "from 140.112.42.160 lookup 128 "| wc -l`
+if (( $TABLE_EXIST == 0))
+then	
+	sudo ip rule add table 128 from 140.112.42.160
+	echo "New rule added"
+fi 
+## add routes to table 128 if not added
+ROUTE_1_EXIST=`ip route show table 128 | grep "default via 140.112.42.254 dev enp3s0" | wc -l`
+ROUTE_2_EXIST=`ip route show table 128 | grep "140.112.42.0/24 dev enp3s0 scope link " | wc -l`
+if (( $ROUTE_1_EXIST == 0))
+then	
+	sudo ip route add table 128 default via 140.112.42.254
+	echo "New route added to table 128"
+fi 
+if (( $ROUTE_2_EXIST == 0))
+then	
+	sudo ip route add table 128 to 140.112.42.0/24 dev enp3s0
+	echo "New route added to table 128"
+fi 
+echo Check completed
+echo "--------------------"
+echo Connect to nord vpn server 
 dir="/etc/openvpn/ovpn_tcp"
 authfile="/etc/openvpn/client/auth.txt"
 COUNTRYIDS=(0 2 10 13 14 21 30 33 38 74 80 81 84 97 99 108 140 114 208 195 227 228) 
 while :; do
-	echo ""
 	echo "Select a country"
 	echo " 1 - Albania"
 	echo " 2 - Argentina"
