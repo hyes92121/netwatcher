@@ -15,6 +15,7 @@ function getAllEdge (channel) {
                 edges[ip] += 1
                 tries += 1
               } else { edges[ip] = 1 }
+              console.log(Date.now()/1000)
             }
           })
           .catch(error => {
@@ -53,6 +54,10 @@ function getAllEdge (channel) {
 module.exports = { getAllEdge }
 
 if (require.main === module) {
+<<<<<<< HEAD
   getAllEdge('woke')
+=======
+  getAllEdge('relaxing234')
+>>>>>>> 4bd238f6378d804f314e5030c1c7007f2793537e
     .then(response => console.log(response))
 }

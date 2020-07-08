@@ -2,6 +2,7 @@ const dns = require('dns')
 const LRU = require("lru-cache")
 const stringify = require('json-stringify-safe');
 const util = require('util')
+const { db } = require('./db.js')
 
 const dnsResolve = util.promisify(dns.resolve)
 
@@ -125,4 +126,19 @@ async function getAddress(host){
     local_dns.cache.set(host, dnsEntry)
     return ip  
 }
-module.exports = {getAddress, getStats}
+
+async function recordEdgeServer(host, channel){
+    ip = await getAddress(host)
+    db.writePoints([{measurement: host,
+                    timestamp : new Date(),
+                    tags:{
+                        stream: channel
+                    },
+                    fields:{
+                        ip : ip
+                    }
+        }]
+    )
+    return ip
+}
+module.exports = {getAddress, getStats, recordEdgeServer}

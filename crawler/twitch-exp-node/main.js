@@ -1,8 +1,9 @@
 const config = require('./config.json')
 const { getDataPackage } = require('./get_data_package.js')
 const { getTopKChannelsByLanguage } = require('./get_top_k_channels.js')
-const Influx = require('influx')
-const influx = new Influx.InfluxDB({ host: config.host.name, database: config.database.name })
+const { db } = require('./db.js')
+// const Influx = require('influx')
+// const influx = new Influx.InfluxDB({ host: config.host.name, database: config.database.name })
 
 // Some global variable and functions
 const sleep = async (ms) => {
@@ -15,6 +16,7 @@ let sleepDuration = 60*1000
 
 const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage = 0.8) => {
   const liveChannels = {}
+<<<<<<< HEAD
   influx.getDatabaseNames()
 	.then(names => {
     	  if (!names.includes(config.database.name)) {
@@ -22,6 +24,15 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
           return influx.createDatabase(config.database.name);
     	  }
   })
+=======
+  // influx.getDatabaseNames()
+	// .then(names => {
+  //   	  if (!names.includes(config.database.name)) {
+ 	//    console.log('Database does not exist')
+  //          return influx.createDatabase(config.database.name);
+  //   	  }
+  // })
+>>>>>>> 4bd238f6378d804f314e5030c1c7007f2793537e
   for (const lang of languages) {
     liveChannels[lang] = await getTopKChannelsByLanguage(lang, percentage)
   }
@@ -40,8 +51,13 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
             pkg.tags.client_location = location
             pkg.tags.client_ip = hostIP
             INFLUXBUFFER.push(pkg)
+<<<<<<< HEAD
             if (INFLUXBUFFER.length === 1) {
               influx.writePoints(INFLUXBUFFER)
+=======
+            if (INFLUXBUFFER.length === 50) {
+              db.writePoints(INFLUXBUFFER)
+>>>>>>> 4bd238f6378d804f314e5030c1c7007f2793537e
               console.log('Writing data from buffer into DB')
               INFLUXBUFFER = []
             }
