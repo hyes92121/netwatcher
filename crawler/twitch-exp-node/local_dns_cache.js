@@ -2,7 +2,7 @@ const dns = require('dns')
 const LRU = require("lru-cache")
 const stringify = require('json-stringify-safe');
 const util = require('util')
-const { db } = require('./db.js')
+const { stream_db, db } = require('./db.js')
 
 const dnsResolve = util.promisify(dns.resolve)
 
@@ -137,6 +137,16 @@ async function recordEdgeServer(host, channel){
                     fields:{
                         ip : ip
                     }
+        }]
+    )
+    stream_db.writePoints([{measurement: channel,
+        timestamp : new Date(),
+        tags:{
+            host: host
+        },
+        fields:{
+            ip : ip
+        }
         }]
     )
     return ip

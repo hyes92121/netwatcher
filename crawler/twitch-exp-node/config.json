@@ -3,11 +3,7 @@
 	"name":"localhost"
   },
   "database":{
-<<<<<<< HEAD
 	"name":"test_jason"
-=======
-	"name":"test_jason"
->>>>>>> 4bd238f6378d804f314e5030c1c7007f2793537e
   },
   "vpn_host": {
 	"ip":"140.112.42.160",

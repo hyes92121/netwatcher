@@ -58,12 +58,6 @@ function lookUpAndRecord (uri,channel) {
   const host = url.parse(uri, true).hostname
   return new Promise((resolve, reject) => {
     resolve(recordEdgeServer(host,channel))
-    // dns.resolve(host, (err, addrs, family) => {
-    //   if (err != null) {
-    //     reject(err)
-    //   } else { 
-    //     resolve(addrs[0]) }
-    // })
   })
 }
 
