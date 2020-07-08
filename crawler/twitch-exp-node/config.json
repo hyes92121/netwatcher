@@ -3,12 +3,12 @@
 	"name":"localhost"
   },
   "database":{
-	"name":"test_4"
+	"name":"test_10"
   },
   "vpn_host": {
 	"ip":"140.112.42.160",
 	"country":"tw"	 
   },
   "viewer_percentage":0.8,
-  "languages":["ko","ja"]
+  "languages":["zh"]
 }

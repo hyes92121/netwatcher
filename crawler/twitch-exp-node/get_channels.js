@@ -31,7 +31,7 @@ if (require.main === module) {
   (async () => {
     console.log('Start')
     try {
-      const response = await getChannels('ko')
+      const response = await getChannels('zh')
       console.log(response.length)
     } catch (error) {
       console.log(error)

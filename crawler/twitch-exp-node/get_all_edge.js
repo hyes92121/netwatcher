@@ -38,21 +38,21 @@ function getAllEdge (channel) {
       }
     }
 
-    var hrstart = process.hrtime()
+    let hrstart = process.hrtime()
     const interval = setInterval(() => {
       batchGetEdgeAddr(channel);
-      if (tries >= 10) { 
+      if (tries >= 3) { 
           clearInterval(interval)
-          console.info('Finshed getting all edges with execution time (hr): %ds %dms', process.hrtime(hrstart)[0], process.hrtime(hrstart)[1]/1000000)
+          // console.info('Finshed getting all edges with execution time (hr): %ds %dms', process.hrtime(hrstart)[0], process.hrtime(hrstart)[1]/1000000)
           resolve({time: process.hrtime(hrstart)[0], ipList: edges}) 
       }
-    }, 5000)
+    }, 1000)
   })
 }
 
 module.exports = { getAllEdge }
 
 if (require.main === module) {
-  getAllEdge('lpl')
+  getAllEdge('woke')
     .then(response => console.log(response))
 }
