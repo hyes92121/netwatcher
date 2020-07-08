@@ -1,8 +1,9 @@
 const config = require('./config.json')
 const { getDataPackage } = require('./get_data_package.js')
 const { getTopKChannelsByLanguage } = require('./get_top_k_channels.js')
-const Influx = require('influx')
-const influx = new Influx.InfluxDB({ host: config.host.name, database: config.database.name })
+const { db } = require('./db.js')
+// const Influx = require('influx')
+// const influx = new Influx.InfluxDB({ host: config.host.name, database: config.database.name })
 
 // Some global variable and functions
 const sleep = async (ms) => {
@@ -16,13 +17,13 @@ let is_first = true
 
 const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage = 0.8) => {
   const liveChannels = {}
-  influx.getDatabaseNames()
-	.then(names => {
-    	  if (!names.includes(config.database.name)) {
- 	   console.log('Database does not exist')
-           return influx.createDatabase(config.database.name);
-    	  }
-  })
+  // influx.getDatabaseNames()
+	// .then(names => {
+  //   	  if (!names.includes(config.database.name)) {
+ 	//    console.log('Database does not exist')
+  //          return influx.createDatabase(config.database.name);
+  //   	  }
+  // })
   for (const lang of languages) {
     liveChannels[lang] = await getTopKChannelsByLanguage(lang, percentage)
   }
@@ -55,7 +56,7 @@ const record = async (hostIP, location = 'tw', languages = 'zh-tw', percentage =
             // influx.writePoints([pkg])
             INFLUXBUFFER.push(pkg)
             if (INFLUXBUFFER.length === 50) {
-              influx.writePoints(INFLUXBUFFER)
+              db.writePoints(INFLUXBUFFER)
               console.log('Writing data from buffer into DB')
               INFLUXBUFFER = []
             }
