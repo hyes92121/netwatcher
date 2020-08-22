@@ -30,16 +30,7 @@ const local_dns = {lru_cache_config:{
                           pruneProcess: undefined,
                           cache: undefined
 }
-// dnsEntry = {
-//   host: 'www.google.com',
-//   ips: [
-//     '34.205.98.207',
-//     '3.82.118.51',
-//   ],
-//   nextIdx: 0, return ip in next index from ips
-//   lastUsedMs: 1555771516581, last time this entry is used in millisecond
-//   lastUpdatedMs: 1555771516581, last time this entry is updated in millisecond
-// }
+
 init()
 
 function init(){

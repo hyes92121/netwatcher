@@ -1,5 +1,5 @@
-const axios = require('axios')
-const { global_axios } = require('./global_axios.js')
+const { globalAxios } = require('./globalAxios.js')
+
 function twitchAPI (path, args) {
   const api = `https://api.twitch.tv${path}`
   const options = {
@@ -10,7 +10,7 @@ function twitchAPI (path, args) {
     params: { ...{ as3: 't' }, ...args }
   }
 
-  return global_axios.get(api, options)
+  return globalAxios.get(api, options)
 }
 
 const twitchAPIAsync = async (path, args) => {
@@ -24,7 +24,7 @@ const twitchAPIAsync = async (path, args) => {
   }
 
   try {
-    const response = await global_axios.get(api, options)
+    const response = await globalAxios.get(api, options)
     return response
   } catch (error) {
     console.log(error)
@@ -36,7 +36,7 @@ function usherAPI (path, args) {
   const options = {
     params: { ...{ client_id: 'kimne78kx3ncx6brgo4mv6wki5h1ko' }, ...args }
   }
-  return global_axios.get(api, options)
+  return globalAxios.get(api, options)
 }
 
 function hostingAPI (path, args) {
@@ -44,7 +44,7 @@ function hostingAPI (path, args) {
   const options = {
     params: { ...{ client_id: 'kimne78kx3ncx6brgo4mv6wki5h1ko' }, ...args }
   }
-  return global_axios.get(api, options)
+  return globalAxios.get(api, options)
 }
 
 module.exports = { twitchAPI, usherAPI, hostingAPI, twitchAPIAsync }

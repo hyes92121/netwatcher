@@ -37,6 +37,7 @@ function getEdgePlaylistUrl (playlist) {
       uri: lines[i]
     })
   }
+  console.log(parsedPlaylist)
   return parsedPlaylist[0].uri
 }
 
@@ -73,6 +74,6 @@ function getEdgeAddr (channel) {
 module.exports = { getEdgeAddr }
 
 if (require.main === module) {
-  getEdgeAddr('lpl')
+  getEdgeAddr('lcs')
     .then(response => console.log(response))
 }
