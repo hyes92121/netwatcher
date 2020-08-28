@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "influx": "^5.4.2",
+    "ioredis": "^4.17.3",
     "json-stringify-safe": "^5.0.1",
     "lru-cache": "^5.1.1",
     "m3u8-parser": "^4.4.0",
