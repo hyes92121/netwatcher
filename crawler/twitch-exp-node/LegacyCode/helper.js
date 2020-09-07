@@ -1,4 +1,4 @@
-const { twitchAPI } = require('./api.js')
+const { twitchAPI } = require('../api.js')
 
 // TODO: implement id cache and lookup function
 const idCache = {}

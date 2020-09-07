@@ -1,5 +1,5 @@
 const BaseCache = require('./BaseCache.js')
-const { twitchAPI } = require('../api.js')
+const API = require('../Api.js')
 
 class StreamInfoCache extends BaseCache {
   constructor() { super(); this.childClass = 'StreamInfoCache' }
@@ -12,13 +12,13 @@ class StreamInfoCache extends BaseCache {
   }
 
   getChannelId(channel) {
-    return twitchAPI('/kraken/users', { login: channel })
-      .then(response => { return response.data.users[0]._id }) // get channel id
+    return API.twitchAPI('/kraken/users', { login: channel })
+      .then(response => response.data.users[0]._id) // get channel id
   }
 
   getChannelAccessToken(channel) {
-    return twitchAPI(`/api/channels/${channel}/access_token`)
-      .then(response => { return response.data })
+    return API.twitchAPI(`/api/channels/${channel}/access_token`)
+      .then(response => response.data)
   }
 }
 

@@ -1,4 +1,4 @@
-const { twitchAPI, hostingAPI } = require('./api.js')
+const { twitchAPI, hostingAPI } = require('../api.js')
 
 function isHosting (channel) {
   return twitchAPI('/kraken/users', { login: channel })

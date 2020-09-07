@@ -3,23 +3,23 @@ const { isHosting } = require('./check_if_hosting.js')
 const { isOnline } = require('./check_if_online.js')
 const { getAllEdge } = require('./get_all_edge.js')
 
-function getAllEdgeSummary (channel) {
+function getAllEdgeSummary(channel) {
   return getAllEdge(channel)
     .then(response => {
       let ipList = response.ipList
       // console.log(response.time)
       return {
-          fields: {
+        fields: {
           num_edge: Object.keys(ipList).length,
           ip_list: Object.keys(ipList).join(','),
           fq_count: Object.values(ipList).join(',')
         },
-          time: response.time
+        time: response.time
       }
     })
 }
 
-async function getDataPackage (channel) {
+async function getDataPackage(channel) {
   return isOnline(channel)
     .then(response => {
       if (response) {
@@ -34,9 +34,9 @@ async function getDataPackage (channel) {
     .then(response => {
       const info = response[0]; const summary = response[1]
       info.fields = { ...info.fields, ...summary.fields }
-      return new Promise((resolve, reject) => { 
-          pkg = {time: summary.time, info: info}
-          resolve(pkg) 
+      return new Promise((resolve, reject) => {
+        const pkg = { time: summary.time, info: info }
+        resolve(pkg)
       })
     })
 }

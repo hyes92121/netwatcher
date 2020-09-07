@@ -1,9 +1,9 @@
 const { Worker } = require('worker_threads')
-const { getChannels } = require('./get_channels.js')
+const Twitch = require('../Twitch.js')
 
 function runService (workerData) {
   return new Promise((resolve, reject) => {
-    const worker = new Worker('./service.js', { workerData })
+    const worker = new Worker('./Utils/service.js', { workerData })
     worker.on('message', resolve)
     worker.on('error', reject)
     worker.on('exit', (code) => {
@@ -12,9 +12,9 @@ function runService (workerData) {
   })
 }
 
-const getTopKChannelsByLanguage = async (language = 'zh-tw', percentage = 0.8) => {
+const getTopKChannels = async (language = 'es', percentage = 0.8) => {
   try {
-    const allChannels = await getChannels(language)
+    const allChannels = await Twitch.getChannelsByLanguage(language)
     const topKChannels = await runService({ data: allChannels, percentage: percentage })
     console.log(`Returning ${topKChannels.length} out of ${allChannels.length} for ${language} channels`)
     return topKChannels
@@ -23,18 +23,10 @@ const getTopKChannelsByLanguage = async (language = 'zh-tw', percentage = 0.8) =
   }
 }
 
-module.exports = { getTopKChannelsByLanguage }
+module.exports = { getTopKChannels }
 
 if (require.main === module) {
-  (async () => {
-    console.log('Start')
-    try {
-      const allChannels = await getChannels('ko')
-      const result = await runService({ data: allChannels, percentage: 0.8 })
-      console.dir(result, { depth: null })
-      console.log(result.length)
-    } catch (error) {
-      console.log(error)
-    }
-  })()
+  // eslint-disable-next-line no-undef
+  getTopKChannels(language = 'zh')
+  // getTopKChannels().then(result => { console.dir(result, { depth: null }); console.log(result.length) })
 }

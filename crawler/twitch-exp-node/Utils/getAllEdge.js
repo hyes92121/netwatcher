@@ -1,4 +1,5 @@
 const { getEdgeAddr } = require('./get_edge_addr.js')
+const Twitch = require('../Twitch.js')
 
 function getAllEdge(channel) {
   const edges = {}

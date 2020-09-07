@@ -1,14 +1,18 @@
-const { URL } = require('url') // (native) provides utilities for URL resolution and parsing
-const { axiosLookupBeforeGet, usherAPI } = require('../api.js')
-const { lookupStreamCache } = require('../Cache/StreamInfoCache.js')
-const { lookupDNSCache } = require('../Cache/DNSCache.js')
+const url = require('url')
+const dns = require('dns')
+const axios = require('axios')
+const { global_axios } = require('./global_axios.js')
+const { twitchAPI, usherAPI } = require('../api.js')
 const m3u8Parser = require('m3u8-parser')
+const { getAddress, recordEdgeServer } = require('../local_dns_cache.js')
 
-function getAccessToken(channel) {
-  return lookupStreamCache(channel).then(response => response.accessToken )
+function getAccessToken (channel) {
+  return twitchAPI(`/api/channels/${channel}/access_token`).then(
+    (response) => { return response.data }
+  )
 }
 
-function getMasterPlaylist(token, channel) {
+function getMasterPlaylist (token, channel) {
   const params = {
     player: 'twitchweb',
     token: token.token,
@@ -17,12 +21,13 @@ function getMasterPlaylist(token, channel) {
     allow_source: true,
     p: Math.floor(Math.random() * 99999) + 1
   }
-  return usherAPI(`/api/channel/hls/${channel}.m3u8`, params)
-  .then(response => response.data )
+  return usherAPI(`/api/channel/hls/${channel}.m3u8`, params).then((response) => {
+    return response.data
+  })
 }
 
 // get Media Playlist that contains URLs of the files needed for streaming
-function getEdgePlaylistUrl(playlist) {
+function getEdgePlaylistUrl (playlist) {
   const parsedPlaylist = []
   const lines = playlist.split('\n')
   for (let i = 4; i < lines.length - 1; i += 3) {
@@ -37,8 +42,9 @@ function getEdgePlaylistUrl(playlist) {
 }
 
 function getPlaylist (uri) {
-  return axiosLookupBeforeGet(uri)
-    .then(response => response.data )
+  return global_axios.get(uri).then((response) => {
+    return response.data
+  })
 }
 
 function getEdgeUrl (raw) {
@@ -49,21 +55,25 @@ function getEdgeUrl (raw) {
   return parser.manifest.segments.slice(-1).pop().uri
 }
 
+function lookUpAndRecord (uri, channel) {
+  const host = url.parse(uri, true).hostname
+  return new Promise((resolve, reject) => {
+    resolve(recordEdgeServer(host, channel))
+  })
+}
+
 function getEdgeAddr (channel) {
   return getAccessToken(channel)
     .then(token => getMasterPlaylist(token, channel))
     .then(raw => getEdgePlaylistUrl(raw))
     .then(uri => getPlaylist(uri))
-    .then(raw => { 
-      const urlObj = new URL(getEdgeUrl(raw))
-      return urlObj.hostname
-    })
-    .then(hostname => lookupDNSCache(hostname))
+    .then(raw => getEdgeUrl(raw))
+    .then(uri => lookUpAndRecord(uri, channel))
 }
 
 module.exports = { getEdgeAddr }
 
 if (require.main === module) {
-  getEdgeAddr('zrush')
+  getEdgeAddr('lcs')
     .then(response => console.log(response))
 }

@@ -1,4 +1,4 @@
-const { twitchAPI } = require('./api.js')
+const { twitchAPI } = require('../api.js')
 
 function getStreamInfo (channel) {
   return twitchAPI('/kraken/users', { login: channel })

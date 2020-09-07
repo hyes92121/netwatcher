@@ -2,32 +2,22 @@
 /* eslint-disable space-infix-ops */
 /* eslint-disable promise/param-names */
 const Twitch = require('./Twitch.js')
-const Pen = require('./Pen.js')
 const { getTopKChannelsByLanguage } = require('./Aggregator.js')
 
-const main = async () => {
-  const pool = new ProbingPool('zh')
-  await new Promise(r => setTimeout(r, 10*60*1000))
-  pool.stop()
-}
-
-class ProbingPool {
+class ProbingManager {
   constructor(language) {
     this.language = language
     this.topKChannels = null
     this.liveProbes = {}
     this.cleanUpInactiveProbesTimer = null
     this.refreshTopKChannelsTimer = null
-    this.cleanupInterval = 1 // minutes
-    this.refreshInterval = 2 // minutes
-    this.isActive = true
 
     this.setup()
   }
 
   setup() {
-    this.cleanUpInactiveProbesTimer = setInterval(() => { this.cleanUpInactiveProbes() }, this.cleanupInterval*60*1000)
-    this.refreshTopKChannelsTimer = setInterval(() => { this.refreshTopKChannels() }, this.refreshInterval*60*1000)
+    this.cleanUpInactiveProbesTimer = setInterval(() => { this.cleanUpInactiveProbes() }, 1 * 60 * 1000)
+    this.refreshTopKChannelsTimer = setInterval(() => { this.refreshTopKChannels() }, 2 * 60 * 1000)
     this.start()
   }
 
@@ -44,32 +34,27 @@ class ProbingPool {
   }
 
   async refreshTopKChannels() {
-    Pen.write('Refreshing top k channels...', 'blue')
-    // console.log('Refreshing top k channels...')
+    console.log('Refreshing top k channels...')
     const oldTopKChannels = new Set(Object.keys(this.liveProbes))
     getTopKChannelsByLanguage(this.language)
       .then(channels => {
         const newTopKChannels = new Set(channels)
         const toBeAdded = [...newTopKChannels].filter(x => !oldTopKChannels.has(x))
         const toBeDeleted = [...oldTopKChannels].filter(x => !newTopKChannels.has(x))
-        if (toBeAdded.length) { Pen.write(`Adding ${toBeAdded}`, 'blue') }
-        if (toBeDeleted.length) { Pen.write(`Clearing ${toBeDeleted}`, 'blue') }
+        console.log(`Adding ${toBeAdded}`)
+        console.log(`Deleting ${toBeDeleted}`)
 
-        for (const channel of toBeAdded) { 
-          if (this.isActive) this.liveProbes[channel] = new StreamProbe(channel)
-        }
-        for (const channel of toBeDeleted) {
-          if (channel in this.liveProbes) this.liveProbes[channel].clearProbingFunc()
-        }
+        for (const channel of toBeAdded) { this.liveProbes[channel] = new StreamProbe(channel) }
+        for (const channel of toBeDeleted) { this.liveProbes[channel].clearProbingFunc() }
       })
   }
 
   cleanUpInactiveProbes() {
-    Pen.write('Cleaning up inactive probes...', 'magenta')
+    console.log('Cleaning up inactive probes...')
     for (const [channel, probe] of Object.entries(this.liveProbes)) {
-      if (!probe.isActive) { delete this.liveProbes[channel]; Pen.write(`Deleted ${channel} from probing list`, 'magenta') }
+      if (!probe.isActive) { delete this.liveProbes[channel]; console.log(`Deleted ${channel} from probing list`) }
     }
-    Pen.write(`Current number of live probes: ${Object.keys(this.liveProbes).length}`, 'magenta')
+    console.log(`Current number of live probes: ${Object.keys(this.liveProbes).length}`)
   }
 
   stop() {
@@ -92,7 +77,6 @@ class StreamProbe {
     this.max = 1 // minutes
     this.min = 5 // minutes
     this.isActive = true
-    this.serverPool = []
 
     this.setup()
   }
@@ -119,17 +103,15 @@ class StreamProbe {
   }
 
   handleError(error) {
-    try {
-      if ([403, 404].includes(error.response.status)) Pen.write(`${this.channel} is not online.`, 'red')
-      else console.log(error.response)
-    } catch (err) { console.log(error); console.log(err) }
+    if ([403, 404].includes(error.response.status)) { console.log(`${this.channel} is not online.`) }
+    else { console.log(error.response) }
     this.clearProbingFunc()
   }
 
   clearProbingFunc() {
     clearTimeout(this.probingTimer)
     this.isActive = false
-    Pen.write(`${this.channel} cleared.`, 'red')
+    console.log(`${this.channel} cleared.`)
   }
 
   randomNum() { return Math.random() * (this.max - this.min) + this.min }
@@ -137,4 +119,4 @@ class StreamProbe {
   setTimerRange(min, max) { this.min = min; this.max = max }
 }
 
-main()
+module.exports = { ProbingManager, StreamProbe }
