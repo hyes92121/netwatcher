@@ -1,4 +1,3 @@
-const Twitch = require('./Twitch')
 const { getTopKChannels } = require('./Utils/getTopKChannels.js')
 
 class Aggregator {

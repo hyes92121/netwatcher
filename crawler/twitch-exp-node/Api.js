@@ -82,17 +82,4 @@ if (require.main === module) {
   test()
 }
 
-/**
- * const twitchAPIAsync = async (path, args) => {
-  const api = `https://api.twitch.tv${path}`
-
-  try {
-    const response = await axiosLookupBeforeGet(api, args)
-    return response
-  } catch (error) {
-    console.log(error)
-  }
-}
- */
-// return axios.get(api, options)
 module.exports = API
