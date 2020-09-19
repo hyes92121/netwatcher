@@ -12,7 +12,7 @@ const palette = {
 class Pen {
   static write(text, color) {
     if (!(Object.prototype.hasOwnProperty.call(palette, color))) { color = palette.white }
-    console.log(`\x1b[${palette[color]}m%s\x1b[0m`, text)
+    console.log(`\x1b[${palette[color]}m${new Date()}: %s\x1b[0m`, text)
   }
 }
 

@@ -9,7 +9,7 @@ class BaseCache {
       if (!this.cache[entry]) {
         console.log(`${this.childClass} cache miss: ${entry}`)
         await this.onMiss(entry)
-      } // else { console.log(`${this.childClass} cache hit: ${entry}`) }
+      } 
       resolve(this.cache[entry])
     })
   }
