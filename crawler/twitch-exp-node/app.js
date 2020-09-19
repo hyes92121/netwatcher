@@ -7,7 +7,7 @@ const API = require('./Api.js')
 const app = express()
 const port = 3000
 
-const pool = new ProbingPool('zh')
+const pool = new ProbingPool(process.env.LANGUAGE)
 
 app.get('/api/info/liveprobes', (req, res) => {
     res.send({ liveProbes: pool.getLiveProbes() })
@@ -15,6 +15,11 @@ app.get('/api/info/liveprobes', (req, res) => {
 
 app.get('/api/count', (req, res) => {
     res.send({ requestCount: API.getRequestCount() })
+})
+
+app.post('/api/pool/start', (req, res) => {
+    pool.run()
+    res.send({ status: true, msg: 'Probing pool started' })
 })
 
 app.post('/api/pool/stop', (req, res) => {

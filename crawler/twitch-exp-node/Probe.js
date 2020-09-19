@@ -21,7 +21,7 @@ class ProbingPool {
     this.cleanUpInactiveProbesTimer = null
     this.refreshTopKChannelsTimer = null 
 
-    this.setup()
+    // this.setup()
   }
 
   setup() {
@@ -30,6 +30,8 @@ class ProbingPool {
     this.refreshTopKChannelsTimer = setInterval(() => { this.refreshTopKChannels() }, this.refreshInterval*60*1000)
     this.start()
   }
+
+  run() { this.setup() }
 
   async start() {
     getTopKChannelsByLanguage(this.language)
@@ -66,7 +68,9 @@ class ProbingPool {
   cleanUpInactiveProbes() {
     Pen.write('Cleaning up inactive probes...', 'magenta')
     for (const [channel, probe] of Object.entries(this.liveProbes)) {
-      if (!probe.isActive) { delete this.liveProbes[channel]; Pen.write(`Deleted ${channel} from probing list`, 'magenta') }
+      if (!probe.isActive) { 
+        delete this.liveProbes[channel]; 
+        Pen.write(`Deleted ${channel} from probing list`, 'magenta') }
     }
     Pen.write(`Current number of live probes: ${Object.keys(this.liveProbes).length}`, 'magenta')
   }
@@ -96,6 +100,7 @@ class StreamProbe {
     this.min = 5 // minutes
     this.isActive = true
     this.serverPool = {}
+    this.transactionBuffer = {}
 
     this.setup()
   }
@@ -130,6 +135,7 @@ class StreamProbe {
     } else {
       this.serverPool[addr] += 1
     }
+    this.transactionBuffer[getCurrentTimeString()] = addr
   }
 
   handleError(error) {
@@ -143,11 +149,20 @@ class StreamProbe {
   clearProbingFunc() {
     clearTimeout(this.probingTimer)
     this.isActive = false
+    // WRITE to database
     Pen.write(`${this.channel} cleared. All probed addresses: ${Object.keys(this.serverPool)}`, 'red')
+  }
+
+  writeTransaction(){
+    
   }
 
   // TODO: set timer interval based on frequency of return edge address (exponetial backoff)
   randomNum() { return Math.random() * (this.max - this.min) + this.min }
+  getCurrentTimeString() {
+    var today = new Date()
+    return today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate()+' '+today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds()
+  }
 
   setTimerRange(min, max) { this.min = min; this.max = max }
 }
