@@ -146,7 +146,7 @@ class StreamProbe {
     Pen.write(`${this.channel} cleared. All probed addresses: ${Object.keys(this.serverPool)}`, 'red')
   }
 
-  // TODO: set timer interval based on frequency of return edge address
+  // TODO: set timer interval based on frequency of return edge address (exponetial backoff)
   randomNum() { return Math.random() * (this.max - this.min) + this.min }
 
   setTimerRange(min, max) { this.min = min; this.max = max }
