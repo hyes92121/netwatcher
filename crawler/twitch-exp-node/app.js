@@ -1,6 +1,6 @@
 const express = require('express')
-const assert = require('assert');
-const AssertionError = require('assert').AssertionError;
+const assert = require('assert')
+const AssertionError = require('assert').AssertionError
 const ProbingPool = require('./Probe.js')
 const API = require('./Api.js')
 
@@ -10,28 +10,28 @@ const port = 3000
 const pool = new ProbingPool(process.env.LANGUAGE)
 
 app.get('/api/info/liveprobes', (req, res) => {
-    res.send({ liveProbes: pool.getLiveProbes() })
+  res.send({ liveProbes: pool.getLiveProbes() })
 })
 
 app.get('/api/count', (req, res) => {
-    res.send({ requestCount: API.getRequestCount() })
+  res.send({ requestCount: API.getRequestCount() })
 })
 
 app.post('/api/pool/start', (req, res) => {
-    pool.run()
-    res.send({ status: true, msg: 'Probing pool started' })
+  pool.run()
+  res.send({ status: true, msg: 'Probing pool started' })
 })
 
 app.post('/api/pool/stop', (req, res) => {
-    try {
-        assert(pool.isActive)
-        pool.stop()
-    } catch(e) {
-        if (e instanceof AssertionError) { res.send({ status: false, msg: 'pool already stopped'}) }
-    }
-    res.send({ status: true, msg: 'probingPool stopped' })
+  try {
+    assert(pool.isActive)
+    pool.stop()
+  } catch (e) {
+    if (e instanceof AssertionError) { res.send({ status: false, msg: 'pool already stopped' }) }
+  }
+  res.send({ status: true, msg: 'probingPool stopped' })
 })
 
 app.listen(port, () => {
-    console.log(`ProbingPool listening at http://localhost:${port}`)
+  console.log(`ProbingPool listening at http://localhost:${port}`)
 })

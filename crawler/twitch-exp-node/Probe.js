@@ -16,10 +16,10 @@ class ProbingPool {
     this.liveProbes = {}
     this.cleanupInterval = 1 // minutes
     this.refreshInterval = 2 // minutes
-    
-    /* Timers */ 
+
+    /* Timers */
     this.cleanUpInactiveProbesTimer = null
-    this.refreshTopKChannelsTimer = null 
+    this.refreshTopKChannelsTimer = null
 
     // this.setup()
   }
@@ -56,7 +56,7 @@ class ProbingPool {
         if (toBeAdded.length) { Pen.write(`Adding ${toBeAdded}`, 'blue') }
         if (toBeDeleted.length) { Pen.write(`Clearing ${toBeDeleted}`, 'blue') }
 
-        for (const channel of toBeAdded) { 
+        for (const channel of toBeAdded) {
           if (this.isActive) this.liveProbes[channel] = new StreamProbe(channel)
         }
         for (const channel of toBeDeleted) {
@@ -68,7 +68,7 @@ class ProbingPool {
   cleanUpInactiveProbes() {
     Pen.write('Cleaning up inactive probes...', 'magenta')
     for (const [channel, probe] of Object.entries(this.liveProbes)) {
-      if (!probe.isActive) { 
+      if (!probe.isActive) {
         delete this.liveProbes[channel]; 
         Pen.write(`Deleted ${channel} from probing list`, 'magenta') }
     }
@@ -85,7 +85,7 @@ class ProbingPool {
     this.isActive = false
   }
 
-  // information reporting methods 
+  // information reporting methods
   getLiveProbes() { return Object.keys(this.liveProbes) }
 }
 
@@ -96,6 +96,7 @@ class StreamProbe {
     this.id = null
     this.token = null
     this.probingTimer = null
+    this.createdOn = this.getCurrentTimeString()
     this.max = 1 // minutes
     this.min = 5 // minutes
     this.isActive = true
@@ -135,7 +136,7 @@ class StreamProbe {
     } else {
       this.serverPool[addr] += 1
     }
-    this.transactionBuffer[getCurrentTimeString()] = addr
+    this.transactionBuffer[this.getCurrentTimeString()] = addr
   }
 
   handleError(error) {
@@ -154,7 +155,14 @@ class StreamProbe {
   }
 
   writeTransaction(){
-    
+    var serverCountry= process.env.CONNECT
+    var channel = this.channel
+    var uniqueList = Object.values(this.transactionBuffer).filter((v, i, a) => a.indexOf(v) === i); 
+    var transaction = {
+      channel: channel,
+      
+    }
+
   }
 
   // TODO: set timer interval based on frequency of return edge address (exponetial backoff)
@@ -166,7 +174,6 @@ class StreamProbe {
 
   setTimerRange(min, max) { this.min = min; this.max = max }
 }
-
 
 if (require.main === module) {
   const main = async () => {
