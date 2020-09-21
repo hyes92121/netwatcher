@@ -14,5 +14,6 @@ export async function makeDb () {
     return client.db(dbName)
 }
 
-const userDb = makeUserDb({makeDb})
+const transactionDb = makeTransactionDb({makeDb})
+module.exports = {transactionDb}
 
