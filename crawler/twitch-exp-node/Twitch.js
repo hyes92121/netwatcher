@@ -1,5 +1,5 @@
 const API = require('./Api.js')
-const { lookupStreamCache } = require('./Cache/StreamInfoCache.js')
+const { lookupStreamCache, updateChannelToken } = require('./Cache/StreamInfoCache.js')
 const { getEdgeAddr } = require('./Utils/getEdgeAddr.js')
 const { getChannels } = require('./Utils/getChannels.js')
 
@@ -17,7 +17,7 @@ class Twitch {
 
   static getEdgeAddrByChannel(channel) { return getEdgeAddr(channel) }
 
-  static updateChannelToken(channel) {}
+  static updateChannelToken(channel) { return updateChannelToken(channel) }
 
   static getChannelsByLanguage(language) { return getChannels(language) }
 }

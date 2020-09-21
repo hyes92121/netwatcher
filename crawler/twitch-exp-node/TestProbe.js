@@ -111,7 +111,7 @@ class StreamProbe {
   setup() {
     Twitch.lookupStream(this.channel)
       .then(response => { this.id = response.channelId; this.token = response.accessToken })
-      // .then(() => { console.log(this.id); console.log(this.token) })
+      .then(() => { console.log(this.id); console.log(this.token) })
       .then(() => { this.start() })
   }
 
@@ -177,7 +177,7 @@ class StreamProbe {
               }) // restart probing with new token
             break
           
-          /* case 'nauth_sig_invalid':
+          case 'nauth_sig_invalid':
             clearTimeout(this.probingTimer)
             Pen.write(`Updating token for channel ${this.channel}`, 'yellow')
             Twitch.updateChannelToken(this.channel)
@@ -186,7 +186,7 @@ class StreamProbe {
                 Pen.write(`Restarting probing for channel ${this.channel}`, 'yellow')
                 this.start() 
               }) // restart probing with new token
-            break */
+            break
         }
         break 
 
@@ -246,7 +246,7 @@ class StreamProbe {
 
 if (require.main === module) {
   const main = async () => {
-    const probe = new StreamProbe('relaxing234')
+    const probe = new StreamProbe('lcs')
   }
   main()
 } 

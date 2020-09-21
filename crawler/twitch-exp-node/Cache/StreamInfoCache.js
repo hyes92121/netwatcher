@@ -20,10 +20,20 @@ class StreamInfoCache extends BaseCache {
     return API.twitchAPI(`/api/channels/${channel}/access_token`)
       .then(response => response.data)
   }
+
+  updateChannelAccessToken(channel) {
+    return this.getChannelAccessToken(channel)
+      .then(token => {
+        this.cache[channel].accessToken = token
+        return token
+      })
+  }
+
 }
 
 const localStreamCache = new StreamInfoCache()
 
 const lookupStreamCache = async (channel) => { return localStreamCache.lookup(channel) }
+const updateChannelToken = (channel) => { return localStreamCache.updateChannelAccessToken(channel) }
 
-module.exports = { lookupStreamCache }
+module.exports = { lookupStreamCache, updateChannelToken }

@@ -76,12 +76,12 @@ class ProbingPool {
     Pen.write(`Current number of live probes: ${Object.keys(this.liveProbes).length}`, 'magenta')
   }
 
-  stop() {
+  async stop() {
     clearInterval(this.cleanUpInactiveProbesTimer)
     clearInterval(this.refreshTopKChannelsTimer)
     while (Object.keys(this.liveProbes).length !== 0) {
       // eslint-disable-next-line no-unused-vars
-      for (const [_, probe] of Object.entries(this.liveProbes)) { probe.clearProbingFunc() }
+      for (const [_, probe] of Object.entries(this.liveProbes)) { probe.clearProbingFunc(); await new Promise(r => setTimeout(r, 300)) }
       this.cleanUpInactiveProbes()
     }
     this.isActive = false
@@ -111,7 +111,7 @@ class StreamProbe {
   setup() {
     Twitch.lookupStream(this.channel)
       .then(response => { this.id = response.channelId; this.token = response.accessToken })
-      // .then(() => { console.log(this.id); console.log(this.token) })
+      .then(() => { console.log(this.id); console.log(this.token) })
       .then(() => { this.start() })
   }
 
@@ -176,6 +176,17 @@ class StreamProbe {
                 this.start() 
               }) // restart probing with new token
             break
+          
+          case 'nauth_sig_invalid':
+            clearTimeout(this.probingTimer)
+            Pen.write(`Updating token for channel ${this.channel}`, 'yellow')
+            Twitch.updateChannelToken(this.channel)
+              .then((token) => { 
+                this.token = token
+                Pen.write(`Restarting probing for channel ${this.channel}`, 'yellow')
+                this.start() 
+              }) // restart probing with new token
+            break
         }
         break 
 
@@ -201,7 +212,6 @@ class StreamProbe {
     const startTimeStamp = this.createdTimestamp
     const transaction = {
       channel: channel,
-      language: process.env.LANGUAGE,
       start: startTimeStamp,
       end: exitTimeStamp,
       transactionList: this.transactionBuffer,
@@ -209,9 +219,7 @@ class StreamProbe {
     }
     transactionDb.insert(transaction)
       .then( res => {
-        if(res){
-          Pen.write(`Finished writing transaction for ${this.channel} to database`, 'green')
-        }
+        if(res) { Pen.write(`Finished writing transaction for ${this.channel} to database`, 'green') }
       })
   }
 
