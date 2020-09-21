@@ -75,7 +75,7 @@ if (require.main === module) {
       setTimeout(resolve, ms)
     })
   }
-  const channel = 'riotgames'
+  const channel = 'relaxing234'
   const test = async (channel) => {
     getEdgeAddr(channel).then(addr => console.log(addr))
     await sleep(1000)

@@ -22,12 +22,8 @@ class StreamInfoCache extends BaseCache {
   }
 }
 
-const localStreamCache = {
-  cache: new StreamInfoCache()
-}
+const localStreamCache = new StreamInfoCache()
 
-const lookupStreamCache = async (channel) => {
-  return localStreamCache.cache.lookup(channel)
-}
+const lookupStreamCache = async (channel) => { return localStreamCache.lookup(channel) }
 
 module.exports = { lookupStreamCache }

@@ -17,6 +17,8 @@ class Twitch {
 
   static getEdgeAddrByChannel(channel) { return getEdgeAddr(channel) }
 
+  static updateChannelToken(channel) {}
+
   static getChannelsByLanguage(language) { return getChannels(language) }
 }
 
