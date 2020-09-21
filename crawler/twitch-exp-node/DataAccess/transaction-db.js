@@ -1,13 +1,14 @@
-export default function makeTransactionDb ({ makeDb }) {
+function makeTransactionDb ({ makeDb }) {
     return Object.freeze({
       insert,
     })
     async function insert ({...transactionInfo}) {
       const db = await makeDb()
       const result = await db
-        .collection('transactions')
+        .collection(proces.env.CONNECTION)
         .insertOne({ ...transactionInfo})
       const {...insertedInfo } = result.ops[0]
       return {...insertedInfo }
     }
 }
+module.exports = {makeTransactionDb}
