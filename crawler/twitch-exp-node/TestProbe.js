@@ -2,12 +2,12 @@
 /* eslint-disable space-infix-ops */
 /* eslint-disable promise/param-names */
 const Twitch = require('./Twitch.js')
-const Pen = require('./Pen.js')
+const { Pen } = require('./Pen.js')
 const { getTopKChannelsByLanguage } = require('./Aggregator.js')
 const { transactionDb } = require('./DataAccess/index.js')
 
 class ProbingPool {
-  constructor(language) {
+  constructor (language) {
     /* Constant properties. Shouldn't change since object initialization till deletion */
     this.language = language
     this.isActive = true
@@ -25,16 +25,16 @@ class ProbingPool {
     // this.setup()
   }
 
-  setup() {
+  setup () {
     /* Cleanup inactive probes can run more frequently, but refreshing topK should be settable */
     this.cleanUpInactiveProbesTimer = setInterval(() => { this.cleanUpInactiveProbes() }, this.cleanupInterval*60*1000)
     this.refreshTopKChannelsTimer = setInterval(() => { this.refreshTopKChannels() }, this.refreshInterval*60*1000)
     this.start()
   }
 
-  run() { this.setup() }
+  run () { this.setup() }
 
-  async start() {
+  async start () {
     getTopKChannelsByLanguage(this.language)
       .then(async channels => {
         let initStatus = true
@@ -46,7 +46,7 @@ class ProbingPool {
       })
   }
 
-  async refreshTopKChannels() {
+  async refreshTopKChannels () {
     Pen.write('Refreshing top k channels...', 'blue')
     const oldTopKChannels = new Set(Object.keys(this.liveProbes))
     getTopKChannelsByLanguage(this.language)
@@ -66,7 +66,7 @@ class ProbingPool {
       })
   }
 
-  cleanUpInactiveProbes() {
+  cleanUpInactiveProbes () {
     Pen.write('Cleaning up inactive probes...', 'magenta')
     for (const [channel, probe] of Object.entries(this.liveProbes)) {
       if (!probe.isActive) {
@@ -76,7 +76,7 @@ class ProbingPool {
     Pen.write(`Current number of live probes: ${Object.keys(this.liveProbes).length}`, 'magenta')
   }
 
-  stop() {
+  stop () {
     clearInterval(this.cleanUpInactiveProbesTimer)
     clearInterval(this.refreshTopKChannelsTimer)
     while (Object.keys(this.liveProbes).length !== 0) {
@@ -88,11 +88,11 @@ class ProbingPool {
   }
 
   // information reporting methods
-  getLiveProbes() { return Object.keys(this.liveProbes) }
+  getLiveProbes () { return Object.keys(this.liveProbes) }
 }
 
 class StreamProbe {
-  constructor(channel) {
+  constructor (channel) {
     this.channel = channel
     // TODO: Load channel specific info from cache instead of function accessing cache directly
     this.id = null
@@ -108,21 +108,21 @@ class StreamProbe {
     this.setup()
   }
 
-  setup() {
+  setup () {
     Twitch.lookupStream(this.channel)
       .then(response => { this.id = response.channelId; this.token = response.accessToken })
       .then(() => { console.log(this.id); console.log(this.token) })
       .then(() => { this.start() })
   }
 
-  start() {
+  start () {
     Twitch.getEdgeAddrByChannel(this.channel)
       .then(addr => { this.onAddressHit(addr) })
       .then(() => { this.setProbingFunc() })
       .catch(error => { this.handleError(error) })
   }
 
-  setProbingFunc() {
+  setProbingFunc () {
     this.probingTimer = setTimeout(() => {
       Twitch.getEdgeAddrByChannel(this.channel)
         .then(addr => { this.onAddressHit(addr) })
@@ -131,7 +131,7 @@ class StreamProbe {
     }, this.randomNum() * 60 * 1000)
   }
 
-  onAddressHit(addr) {
+  onAddressHit (addr) {
     Pen.write(`Edge server of ${this.channel} is ${addr}`, 'white')
     if (Object.prototype.hasOwnProperty.call(this.serverPool, addr)) {
       this.serverPool[addr] += 1
@@ -142,12 +142,12 @@ class StreamProbe {
     this.transactionBuffer[this.getCurrentTimeString()] = addr
   }
 
-  handleError(error) {
+  handleError (error) {
     const errorStatus = error.response.status
     const errorMessage = error.response.data[0].error
     const errorCode = error.response.data[0].error_code
     const outputErrorMsg = `Channel: "${this.channel}" returned status "${errorStatus}" with error code "${errorCode}" and message "${errorMessage}"`
-    
+
     Pen.write(outputErrorMsg, 'red')
 
     switch (errorStatus) {
@@ -156,39 +156,39 @@ class StreamProbe {
         this.clearProbingFunc()
         break
 
-      /* 403: forbidden, currently I've identified two cases: 
+      /* 403: forbidden, currently I've identified two cases:
          - content_geoblocked (e.g. franchiseglobalart )
          - nauth_token_expired
       */
-      case 403: 
+      case 403:
         // use switch case instead of if/else in case there are other kinds of errors in the future
         switch (errorCode) {
           case 'content_geoblocked':
             this.clearProbingFunc()
-            break 
+            break
           case 'nauth_token_expired':
             clearTimeout(this.probingTimer)
             Pen.write(`Updating token for channel ${this.channel}`, 'yellow')
             Twitch.updateChannelToken(this.channel)
-              .then((token) => { 
+              .then((token) => {
                 this.token = token
                 Pen.write(`Restarting probing for channel ${this.channel}`, 'yellow')
-                this.start() 
+                this.start()
               }) // restart probing with new token
             break
-          
+
           case 'nauth_sig_invalid':
             clearTimeout(this.probingTimer)
             Pen.write(`Updating token for channel ${this.channel}`, 'yellow')
             Twitch.updateChannelToken(this.channel)
-              .then((token) => { 
+              .then((token) => {
                 this.token = token
                 Pen.write(`Restarting probing for channel ${this.channel}`, 'yellow')
-                this.start() 
+                this.start()
               }) // restart probing with new token
             break
         }
-        break 
+        break
 
       default:
         // TODO: some logic to handle other errors (e.g. server errors)
@@ -196,7 +196,7 @@ class StreamProbe {
     }
   }
 
-  clearProbingFunc() {
+  clearProbingFunc () {
     const serverList = Object.keys(this.serverPool)
 
     clearTimeout(this.probingTimer)
@@ -206,7 +206,7 @@ class StreamProbe {
     Pen.write(`${this.channel} cleared. All probed addresses: ${serverList}`, 'yellow')
   }
 
-  writeTransaction() {
+  writeTransaction () {
     const channel = this.channel
     const exitTimeStamp = this.getCurrentTimeString()
     const startTimeStamp = this.createdTimestamp
@@ -218,19 +218,19 @@ class StreamProbe {
       serverPool: Object.keys(this.serverPool)
     }
     transactionDb.insert(transaction)
-      .then( res => {
-        if(res){
+      .then(res => {
+        if (res) {
           Pen.write(`Finished writing transaction for ${this.channel} to database`, 'green')
         }
       })
   }
 
   // TODO: set timer interval based on frequency of return edge address (exponetial backoff)
-  randomNum() { return Math.random() * (this.max - this.min) + this.min }
+  randomNum () { return Math.random() * (this.max - this.min) + this.min }
 
-  getCurrentTimeString() { return new Date().toISOString().replace(/\..+/, '') }
+  getCurrentTimeString () { return new Date().toISOString().replace(/\..+/, '') }
 
-  setTimerRange(min, max) { this.min = min; this.max = max }
+  setTimerRange (min, max) { this.min = min; this.max = max }
 }
 
 /* if (require.main === module) {
@@ -246,9 +246,9 @@ class StreamProbe {
 
 if (require.main === module) {
   const main = async () => {
-    const probe = new StreamProbe('lcs')
+    const probe = new StreamProbe('whoami1408')
   }
   main()
-} 
+}
 
 module.exports = ProbingPool
