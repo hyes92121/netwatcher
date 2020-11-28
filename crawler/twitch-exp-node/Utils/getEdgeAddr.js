@@ -4,11 +4,11 @@ const { lookupStreamCache } = require('../Cache/StreamInfoCache.js')
 const { lookupDNSCache } = require('../Cache/DNSCache.js')
 const m3u8Parser = require('m3u8-parser')
 
-function getAccessToken(channel) {
+function getAccessToken (channel) {
   return lookupStreamCache(channel).then(response => response.accessToken)
 }
 
-function getMasterPlaylist(token, channel) {
+function getMasterPlaylist (token, channel) {
   const params = {
     player: 'twitchweb',
     token: token.token,
@@ -22,7 +22,7 @@ function getMasterPlaylist(token, channel) {
 }
 
 // get Media Playlist that contains URLs of the files needed for streaming
-function parseMasterPlaylist(playlist) {
+function parseMasterPlaylist (playlist) {
   const parsedPlaylist = []
   const lines = playlist.split('\n')
   for (let i = 4; i < lines.length - 1; i += 3) {
@@ -36,16 +36,16 @@ function parseMasterPlaylist(playlist) {
   return parsedPlaylist
 }
 
-function getBestQualityPlaylistUri(playlists) {
+function getBestQualityPlaylistUri (playlists) {
   return playlists[0].uri
 }
 
-function getPlaylistContent(uri) {
+function getPlaylistContent (uri) {
   return API.axiosLookupBeforeGet(uri)
     .then(response => response.data)
 }
 
-function getEdgeUrl(raw) {
+function getEdgeUrl (raw) {
   const parser = new m3u8Parser.Parser()
   parser.push(raw)
   parser.end()
@@ -53,7 +53,7 @@ function getEdgeUrl(raw) {
   return parser.manifest.segments.slice(-1).pop().uri
 }
 
-function getEdgeAddr(channel) {
+function getEdgeAddr (channel) {
   return getAccessToken(channel)
     .then(token => getMasterPlaylist(token, channel))
     .then(masterPlaylist => parseMasterPlaylist(masterPlaylist))
@@ -75,7 +75,7 @@ if (require.main === module) {
       setTimeout(resolve, ms)
     })
   }
-  const channel = 'relaxing234'
+  const channel = 'never_loses'
   const test = async (channel) => {
     getEdgeAddr(channel).then(addr => console.log(addr))
     await sleep(1000)

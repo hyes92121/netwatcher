@@ -8,16 +8,16 @@ const records = []
 
 const getTotalViewers = () => {
   let count = 0
-  for (const stream of workerData.data) { count += stream.viewers }
+  for (const stream of workerData.data) { count += stream.viewer_count }
   return count
 }
 
 const totalViewers = getTotalViewers()
 let accuViewers = 0
 for (const stream of workerData.data) {
-  accuViewers += stream.viewers
-  records.push(stream.channel.name)
+  accuViewers += stream.viewer_count
+  records.push(stream.display_name)
   if ((accuViewers / totalViewers) > workerData.percentage) { break }
 }
-
+console.log(records)
 parentPort.postMessage(records)

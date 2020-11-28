@@ -1,8 +1,8 @@
 const { twitchAPI, hostingAPI } = require('../api.js')
 
 function isHosting (channel) {
-  return twitchAPI('/kraken/users', { login: channel })
-    .then(response => response.data.users[0]._id)
+  return twitchAPI('/helix/users', { login: channel })
+    .then(response => response.data.data[0].id)
     .then(id => { return { include_logins: 1, host: id } })
     .then(params => hostingAPI('/hosts', params))
     .then(response => {

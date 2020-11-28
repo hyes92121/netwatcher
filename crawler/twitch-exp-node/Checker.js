@@ -19,7 +19,7 @@ export class Checker {
 
   static online (channel) {
     return twitchAPI('/helix/users', { login: channel })
-      .then(response => response.data.data[0].id ) // get channel id
+      .then(response => response.data.data[0].id) // get channel id
       .then(id => twitchAPI('/helix/streams', { user_id: id }))
       .then(response => {
         const stream = response.data.data

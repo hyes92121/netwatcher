@@ -1,12 +1,11 @@
 const { getEdgeAddr } = require('./get_edge_addr.js')
-const Twitch = require('../Twitch.js')
 
-function getAllEdge(channel) {
+function getAllEdge (channel) {
   const edges = {}
   let errorCount = 0
   let tries = 0
   return new Promise((resolve, reject) => {
-    function batchGetEdgeAddr(channel) {
+    function batchGetEdgeAddr (channel) {
       // send 5 packets at a time
       for (let i = 0; i < 5; i++) {
         getEdgeAddr(channel)
@@ -39,7 +38,7 @@ function getAllEdge(channel) {
       }
     }
 
-    let hrstart = process.hrtime()
+    const hrstart = process.hrtime()
     const interval = setInterval(() => {
       console.log(`Running batchGetEdgeAddr with tries ${tries}`)
       batchGetEdgeAddr(channel)
