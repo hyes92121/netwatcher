@@ -12,8 +12,8 @@ class StreamInfoCache extends BaseCache {
   }
 
   getChannelId(channel) {
-    return API.twitchAPI('/kraken/users', { login: channel })
-      .then(response => response.data.users[0]._id) // get channel id
+    return API.twitchAPI('/helix/users', { login: channel })
+      .then(response => response.data.data[0].id) // get channel id
   }
 
   getChannelAccessToken(channel) {
@@ -37,3 +37,19 @@ const lookupStreamCache = async (channel) => { return localStreamCache.lookup(ch
 const updateChannelToken = (channel) => { return localStreamCache.updateChannelAccessToken(channel) }
 
 module.exports = { lookupStreamCache, updateChannelToken }
+
+if (require.main === module) {
+  const sleep = async (ms) => {
+    return new Promise(resolve => {
+      setTimeout(resolve, ms)
+    })
+  }
+  const channel = 'never_loses'
+  const test = async (channel) => {
+    lookupStreamCache(channel).then(addr => console.log(addr))
+    await sleep(1000)
+    lookupStreamCache(channel).then(addr => console.log(addr))
+  }
+
+  test(channel)
+}

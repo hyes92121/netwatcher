@@ -75,7 +75,7 @@ if (require.main === module) {
       setTimeout(resolve, ms)
     })
   }
-  const channel = 'relaxing234'
+  const channel = 'never_loses'
   const test = async (channel) => {
     getEdgeAddr(channel).then(addr => console.log(addr))
     await sleep(1000)

@@ -18,11 +18,11 @@ export class Checker {
   }
 
   static online (channel) {
-    return twitchAPI('/kraken/users', { login: channel })
-      .then(response => response.data.users[0]._id) // get channel id
-      .then(id => twitchAPI(`/kraken/streams/${id}`))
+    return twitchAPI('/helix/users', { login: channel })
+      .then(response => response.data.data[0].id) // get channel id
+      .then(id => twitchAPI('/helix/streams', { user_id: id }))
       .then(response => {
-        const stream = response.data.stream
+        const stream = response.data.data
         // TODO: stream might be undefined instead of null
         if (stream) { return true }
         return false
