@@ -12,8 +12,8 @@ class StreamInfoCache extends BaseCache {
   }
 
   getChannelId(channel) {
-    return API.twitchAPI('/kraken/users', { login: channel })
-      .then(response => response.data.users[0]._id) // get channel id
+    return API.twitchAPI('/helix/users', { login: channel })
+      .then(response => response.data.data[0].id ) // get channel id
   }
 
   getChannelAccessToken(channel) {

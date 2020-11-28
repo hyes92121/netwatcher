@@ -5,7 +5,7 @@ function makeTransactionDb ({ makeDb }) {
     async function insert ({...transactionInfo}) {
       const db = await makeDb()
       const result = await db
-        .collection(proces.env.CONNECTION)
+        .collection(proces.env.COUNTRY)
         .insertOne({ ...transactionInfo})
       const {...insertedInfo } = result.ops[0]
       return {...insertedInfo }

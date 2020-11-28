@@ -12,7 +12,7 @@ class Twitch {
   static cacheGetStreamInfo(channel) {
     return lookupStreamCache(channel)
       .then(channelInfo => channelInfo.channelId)
-      .then(id => API.twitchAPI(`/kraken/streams/${id}`))
+      .then(id => API.twitchAPI('/helix/streams', { user_id: id }))
   }
 
   static getEdgeAddrByChannel(channel) { return getEdgeAddr(channel) }

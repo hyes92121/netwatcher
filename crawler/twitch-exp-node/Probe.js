@@ -5,6 +5,7 @@ const Twitch = require('./Twitch.js')
 const Pen = require('./Pen.js')
 const { getTopKChannelsByLanguage } = require('./Aggregator.js')
 const { transactionDb } = require('./DataAccess/index.js')
+const intervalGenerator = require("./Utils/intervalGenerator.js")
 
 class ProbingPool {
   constructor(language) {
@@ -99,11 +100,13 @@ class StreamProbe {
     this.token = null
     this.probingTimer = null
     this.createdTimestamp = this.getCurrentTimeString()
-    this.max = 1 // minutes
-    this.min = 5 // minutes
+    this.min = 0.1 // minutes
+    this.max = 0.5 // minutes
     this.isActive = true
     this.serverPool = {}
     this.transactionBuffer = {}
+    // modes: 'random', 'backoff-strict', 'exp-backoff'
+    this.intervalGenerator = new intervalGenerator('backoff-strict' ,this.max, this.min)
 
     this.setup()
   }
@@ -128,7 +131,7 @@ class StreamProbe {
         .then(addr => { this.onAddressHit(addr) })
         .then(() => { this.setProbingFunc() })
         .catch(error => { this.handleError(error) })
-    }, this.randomNum() * 60 * 1000)
+    }, this.intervalGenerator.generateInterval() * 60 * 1000)
   }
 
   onAddressHit(addr) {
@@ -139,6 +142,7 @@ class StreamProbe {
     } else {
       this.serverPool[addr] += 1
     }
+    this.intervalGenerator.updateServerCount(Object.keys(this.serverPool).length)
     this.transactionBuffer[this.getCurrentTimeString()] = addr
   }
 
@@ -232,3 +236,7 @@ class StreamProbe {
 }
 
 module.exports = ProbingPool
+
+if (require.main === module) {
+  const probe = new StreamProbe('riotgames')
+}
